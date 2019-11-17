@@ -6,6 +6,7 @@ import {
   combineAll,
   concat,
   concatAll,
+  map,
   mergeAll,
   zipAll,
 } from 'rxjs/operators';
@@ -30,15 +31,24 @@ export class InviteService {
 
   invite(user: User) {
     return this.http.post<User>(this.url, user).pipe(
+      map(res => ({ ...res, isError: false })),
       catchError(err => {
-        const error = {
-          user,
-          err,
+        const errorMessage = this._generateErrorMessage(err.status);
+        return of({
+          error: `${err.statusText}: ${errorMessage}`,
           isError: true,
-        };
-        return of(error);
+          user: user.email,
+        });
       }),
     );
+  }
+
+  _generateErrorMessage(errorCode: number) {
+    if (errorCode === 409) {
+      return 'user already exists.';
+    } else if (errorCode === 500) {
+      return 'something went wrong. please try again';
+    }
   }
 
   _invite(users: User[]): Observable<any[]> {
@@ -48,7 +58,6 @@ export class InviteService {
       obsArray.push(invite$);
     });
 
-    // console.log(obsArray);
     return forkJoin(obsArray);
   }
 }
