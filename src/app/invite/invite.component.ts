@@ -20,21 +20,15 @@ const users: User[] = [
   templateUrl: './invite.component.html',
   styleUrls: ['./invite.component.css'],
 })
+// @AutoUnsubscribe()
 export class InviteComponent implements OnInit {
   constructor(private readonly inviteService: InviteService) {}
 
   ngOnInit(): void {}
 
   onSubmit(): void {
-    users.forEach(user => {
-      this.inviteService.invite(user).subscribe(
-        res => {
-          console.log(res);
-        },
-        err => {
-          console.error(err);
-        },
-      );
-    });
+    this.inviteService
+      ._invite(users)
+      .subscribe(res => res.forEach(res2 => console.log(res2)));
   }
 }
