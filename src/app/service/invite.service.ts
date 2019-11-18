@@ -1,15 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { combineLatest, forkJoin, Observable, of, throwError, zip } from 'rxjs';
-import {
-  catchError,
-  combineAll,
-  concat,
-  concatAll,
-  map,
-  mergeAll,
-  zipAll,
-} from 'rxjs/operators';
+import { catchError, combineAll, concat, concatAll, map, mergeAll, zipAll } from 'rxjs/operators';
+import { HttpStatusCode } from '../shared/enum';
 
 export interface User {
   id?: number;
@@ -21,9 +14,7 @@ export interface User {
 })
 export class InviteService {
   private readonly url = 'http://localhost:3000/users';
-  private _errors = [];
-  private _users = [];
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   get(): Observable<User[]> {
     return this.http.get<User[]>(this.url);
@@ -43,12 +34,20 @@ export class InviteService {
     );
   }
 
-  _generateErrorMessage(errorCode: number) {
-    if (errorCode === 409) {
-      return 'user already exists.';
-    } else if (errorCode === 500) {
-      return 'something went wrong. please try again';
+  _generateErrorMessage(errorStatus: number) {
+    let errorMessage = '';
+    switch (errorStatus) {
+      case HttpStatusCode.Conflict:
+        errorMessage = 'user already exists.';
+        break;
+      case HttpStatusCode.Internal_Server_Error:
+        errorMessage = 'something went wrong. please try again';
+        break;
+      default:
+        errorMessage = 'unknown error. Please try again';
+        break;
     }
+    return errorMessage;
   }
 
   _invite(users: User[]): Observable<any[]> {

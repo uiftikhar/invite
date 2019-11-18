@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InviteService, User } from '../service/invite.service';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
+import { AutoUnsubscribe } from '../shared/decorators';
 
 const users: User[] = [
   { email: 'user0@comtravo.com' },
@@ -21,18 +22,13 @@ const users: User[] = [
   templateUrl: './invite.component.html',
   styleUrls: ['./invite.component.css'],
 })
-// @AutoUnsubscribe()
-export class InviteComponent implements OnInit {
+@AutoUnsubscribe()
+export class InviteComponent {
   constructor(private readonly inviteService: InviteService, private readonly router: Router) {}
 
-  ngOnInit(): void {}
-
   onSubmit(): void {
-    this.inviteService
-      ._invite(users)
-      .subscribe(res => res.forEach(res2 => {
-        console.log(res2);
-        this.router.navigate(['/list']);
-      }));
+    this.inviteService._invite(users).subscribe(res =>
+        this.router.navigate(['/list'])
+    );
   }
 }

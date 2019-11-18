@@ -7,13 +7,10 @@ import { InviteService, User } from '../service/invite.service';
   templateUrl: './invite-list.component.html',
   styleUrls: ['./invite-list.component.css']
 })
-export class InviteListComponent implements OnInit {
+export class InviteListComponent {
   users$: Observable<User[]>;
 
-  constructor(private inviteService: InviteService) {
+  constructor(private readonly inviteService: InviteService) {
     this.users$ = this.inviteService.get();
-
   }
-
-  ngOnInit(): void {}
 }
