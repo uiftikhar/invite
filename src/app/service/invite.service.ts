@@ -23,7 +23,7 @@ export class InviteService {
     return this.http.get<User[]>(this.url);
   }
 
-  invite(user: User) {
+  invite(user: User): Observable<User> {
     return this.http.post<User>(this.url, user).pipe(
       map(res => ({ ...res, isError: false })),
       catchError(err => {
@@ -37,7 +37,7 @@ export class InviteService {
     );
   }
 
-  _generateErrorMessage(errorStatus: number) {
+  _generateErrorMessage(errorStatus: number): string {
     let errorMessage = '';
     switch (errorStatus) {
       case HttpStatusCode.Conflict:
@@ -53,14 +53,18 @@ export class InviteService {
     return errorMessage;
   }
 
-  getInvitedUsers() {
+  getInvitedUsers(): {
+    invitedUsers: User[];
+    totalNumberOfInvites: number;
+  } {
+    const invitedUsers = this.invitedUsers.getValue();
     return {
-      invitedUsers: this.invitedUsers.getValue(),
-      totalNumberOfInvites: this.invitedUsers.getValue().filter(user => !user.isError).length,
+      invitedUsers,
+      totalNumberOfInvites: invitedUsers.filter(user => !user.isError).length,
     };
   }
 
-  _invite(users: User[]) {
+  _invite(users: User[]): Observable<User[]> {
     const obsArray = [];
     users.forEach(user => {
       const invite$ = this.invite(user);
