@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { combineLatest, forkJoin, Observable, of, throwError, zip } from 'rxjs';
-import { catchError, combineAll, concat, concatAll, map, mergeAll, zipAll } from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { HttpStatusCode } from '../shared/enum';
 
 export interface User {
   id?: number;
   email: string;
+  error?: string;
+  isError?: boolean;
 }
 
 @Injectable({
@@ -14,6 +16,7 @@ export interface User {
 })
 export class InviteService {
   private readonly url = 'http://localhost:3000/users';
+  private readonly invitedUsers: BehaviorSubject<User[]> = new BehaviorSubject<User[]>([]);
   constructor(private readonly http: HttpClient) {}
 
   get(): Observable<User[]> {
@@ -28,7 +31,7 @@ export class InviteService {
         return of({
           error: `${err.statusText}: ${errorMessage}`,
           isError: true,
-          user: user.email,
+          email: user.email,
         });
       }),
     );
@@ -50,13 +53,20 @@ export class InviteService {
     return errorMessage;
   }
 
-  _invite(users: User[]): Observable<any[]> {
+  getInvitedUsers() {
+    return {
+      invitedUsers: this.invitedUsers.getValue(),
+      totalNumberOfInvites: this.invitedUsers.getValue().filter(user => !user.isError).length,
+    };
+  }
+
+  _invite(users: User[]) {
     const obsArray = [];
     users.forEach(user => {
       const invite$ = this.invite(user);
       obsArray.push(invite$);
     });
 
-    return forkJoin(obsArray);
+    return forkJoin(obsArray).pipe(tap((res: User[]) => this.invitedUsers.next(res)));
   }
 }
