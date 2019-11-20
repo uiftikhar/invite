@@ -6,19 +6,10 @@ import { AppComponent } from './app.component';
 import { InviteListComponent } from './invite-list/invite-list.component';
 import { InviteComponent } from './invite/invite.component';
 
-
 @NgModule({
-  declarations: [
-    AppComponent,
-    InviteComponent,
-    InviteListComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-  ],
+  declarations: [AppComponent, InviteComponent, InviteListComponent],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

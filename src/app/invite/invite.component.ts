@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { InviteService, User } from '../service/invite.service';
+import { Router } from '@angular/router';
+import { AutoUnsubscribe } from '../shared/decorators';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { single, take, takeUntil } from 'rxjs/operators';
 
 const users: User[] = [
   { email: 'user0@comtravo.com' },
@@ -19,22 +23,16 @@ const users: User[] = [
   selector: 'app-invite',
   templateUrl: './invite.component.html',
   styleUrls: ['./invite.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InviteComponent implements OnInit {
-  constructor(private readonly inviteService: InviteService) {}
-
-  ngOnInit(): void {}
+@AutoUnsubscribe()
+export class InviteComponent {
+  constructor(private readonly inviteService: InviteService, private readonly router: Router) {}
 
   onSubmit(): void {
-    users.forEach(user => {
-      this.inviteService.invite(user).subscribe(
-        res => {
-          console.log(res);
-        },
-        err => {
-          console.error(err);
-        },
-      );
-    });
+    this.inviteService
+      .invite(users)
+      .pipe(single())
+      .subscribe(res => this.router.navigate(['/list']));
   }
 }

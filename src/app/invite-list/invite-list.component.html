@@ -1,14 +1,17 @@
+<p>total number of users successfully invited: {{totalInvitedUsers}}</p>
 <table>
   <thead>
     <tr>
       <th>Id</th>
       <th>Email</th>
+      <th>errors</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let user of (users$ | async)">
-      <td>{{ user.id }}</td>
-      <td>{{ user.email }}</td>
+    <tr *ngFor="let invUser of invitedUsers">
+      <td>{{ invUser.id }}</td>
+      <td>{{ invUser.email }}</td>
+      <td>{{ invUser.error }}</td>
     </tr>
   </tbody>
 </table>
