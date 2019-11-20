@@ -41,7 +41,8 @@ export class InviteService {
       obsArray.push(invite$);
     });
 
-    return forkJoin(obsArray).pipe(tap((res: User[]) => this.invitedUsers$.next(res)));
+    const previousInvitedUsers = this.invitedUsers$.getValue();
+    return forkJoin(obsArray).pipe(tap((res: User[]) => this.invitedUsers$.next([...res, ...previousInvitedUsers])));
   }
 
   private _invite(user: User): Observable<User> {

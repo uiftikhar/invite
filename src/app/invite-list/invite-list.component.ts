@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { InviteService, User } from '../service/invite.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-invite-list',
@@ -10,8 +11,8 @@ import { InviteService, User } from '../service/invite.service';
 export class InviteListComponent {
   invitedUsers: User[];
   totalInvitedUsers: number;
-  constructor(private readonly inviteService: InviteService) {
-    const { totalNumberOfInvites, invitedUsers } = this.inviteService.getInvitedUsers();
+  constructor(private readonly inviteService: InviteService, activatedRoute: ActivatedRoute) {
+    const { totalNumberOfInvites, invitedUsers } = activatedRoute.snapshot.data.invitedUserData;
     this.invitedUsers = invitedUsers;
     this.totalInvitedUsers = totalNumberOfInvites;
   }
