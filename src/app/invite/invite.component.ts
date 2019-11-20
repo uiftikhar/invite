@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { InviteService, User } from '../service/invite.service';
 import { Router } from '@angular/router';
 import { AutoUnsubscribe } from '../shared/decorators';
-import {takeUntil} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { single, take, takeUntil } from 'rxjs/operators';
 
 const users: User[] = [
   { email: 'user0@comtravo.com' },
@@ -30,6 +30,9 @@ export class InviteComponent {
   constructor(private readonly inviteService: InviteService, private readonly router: Router) {}
 
   onSubmit(): void {
-    this.inviteService._invite(users).pipe().subscribe(res => this.router.navigate(['/list']));
+    this.inviteService
+      .invite(users)
+      .pipe(single())
+      .subscribe(res => this.router.navigate(['/list']));
   }
 }
