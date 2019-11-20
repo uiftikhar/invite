@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { InviteService, User } from '../service/invite.service';
 import { Router } from '@angular/router';
 import { AutoUnsubscribe } from '../shared/decorators';
-import { single, throttleTime } from 'rxjs/operators';
+import { single, tap, throttleTime } from 'rxjs/operators';
 
 const users: User[] = [
   { email: 'user0@comtravo.com' },
@@ -27,15 +27,19 @@ const users: User[] = [
 @AutoUnsubscribe()
 export class InviteComponent {
   constructor(private readonly inviteService: InviteService, private readonly router: Router) {}
-
+  submitDisabled = false;
   private readonly throttleTime = 1000;
   onSubmit(): void {
+    this.submitDisabled = true;
     this.inviteService
       .invite(users)
       .pipe(
         single(),
         throttleTime(this.throttleTime),
       )
-      .subscribe(res => this.router.navigate(['/list']));
+      .subscribe(() => {
+        this.submitDisabled = false;
+        this.router.navigate(['/list']);
+      });
   }
 }
